@@ -14,9 +14,34 @@ const lorem = new LoremIpsum({
 });
 
 // POST /api/lorem/generate
+// Constants for lorem ipsum generation limits
+const MAX_COUNT = {
+  word: 1000,
+  sentence: 100,
+  paragraph: 50
+};
+
 router.post('/generate', (req, res) => {
-  const { type = 'paragraph', count = 1 } = req.body;
-  const amt = Math.min(parseInt(count), 50);
+  let { type = 'paragraph', count = 1 } = req.body;
+  
+  // Validate type
+  if (!['word', 'sentence', 'paragraph'].includes(type)) {
+    return res.status(400).json({
+      success: false,
+      error: 'Invalid type. Must be word, sentence, or paragraph'
+    });
+  }
+
+  // Validate and limit count
+  count = parseInt(count);
+  if (isNaN(count) || count < 1) {
+    return res.status(400).json({
+      success: false,
+      error: 'Count must be a positive number'
+    });
+  }
+  
+  const amt = Math.min(count, MAX_COUNT[type]);
 
   let result;
   switch (type) {
