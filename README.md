@@ -8,7 +8,7 @@
 
 ## 🚀 Live Demo
 
-https://devnado.onrender.com
+https://devando.onrender.com/
 
 ---
 

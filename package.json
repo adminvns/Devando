@@ -10,7 +10,7 @@
   "keywords": [],
   "author": "Shubham",
   "license": "ISC",
-  "description": "",
+  "description": "A multipurpose API server for various utilities.",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
