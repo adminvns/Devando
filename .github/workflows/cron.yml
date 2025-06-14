@@ -1,0 +1,25 @@
+name: Keep Render Alive with Playwright
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+
+jobs:
+  ping-render:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm install playwright
+      - run: |
+          node -e "
+          const { chromium } = require('playwright');
+          (async () => {
+            const browser = await chromium.launch({ headless: false });
+            const page = await browser.newPage();
+            await page.goto('https://devando.onrender.com/index.html');
+            await page.waitForTimeout(50000);
+            await browser.close();
+          })();
+          "
