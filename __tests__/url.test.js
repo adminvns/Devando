@@ -88,3 +88,4 @@ describe('URL Encoder/Decoder API', () => {
     expect(res2.text).toBe(url);
   });
 });
+});
