@@ -534,7 +534,7 @@ Content-Type: application/json
 
 ```bash
 
-git clone https://github.com/your-username/devando.git
+git clone https://github.com/adminvns/Devnado.git
 
 cd devando
 
@@ -561,8 +561,6 @@ This project is licensed under the **Creative Commons Attribution-NonCommercial-
 Developer APIs, Free JSON Formatter API, UUID Generator REST API, Lorem Ipsum API, Text Encoder API, Hash Generator API, Secure Password Generator API, Timezone Converter API, Regex Matching API, Devando Developer Tools
 
 ```
-
-Make sure to add these as meta tags or Open Graph tags in the public-facing frontend or documentation site.
 
 ---
 
