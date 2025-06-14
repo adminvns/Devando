@@ -12,7 +12,7 @@ router.get('/', (req, res) => {
   const uptimeInSeconds = process.uptime();
 
   res.status(200).json({
-    status: 'ok',
+    status: 'healthy',
     message: 'Health check passed Successfully!',
     uptime: formatUptime(uptimeInSeconds),
     timestamp: new Date().toISOString(),
