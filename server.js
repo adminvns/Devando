@@ -50,7 +50,7 @@ app.get('/', (req, res) => {
       name: 'Devando API Suite',
       version: '1.0.0',
       status: '✅ Up and Running',
-      message: 'Welcome to Devando - Developer Tools API Service',
+      message: 'Welcome to Devando - Developer Tools API Service, Navigate to /index.html for UI and read the docs for using our API services in your application!',
       toolsAvailable: [
         'JSON Formatter',
         'URL Encoder/Decoder',
