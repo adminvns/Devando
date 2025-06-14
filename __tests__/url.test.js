@@ -7,11 +7,22 @@ app.use(express.json());
 app.use('/api/url', urlRouter);
 
 describe('URL Encoder/Decoder API', () => {
-  test('encodes URL with special characters', async () => {
-    const url = 'https://example.com/path with spaces?q=test&special=!@#$%^&*()';
-    const res = await request(app)
-      .post('/api/url/encode')
-      .send({ url });
+  describe('URL Encoding', () => {
+    test('encodes spaces in path', async () => {
+      const url = 'https://example.com/path with spaces';
+      const res = await request(app)
+        .post('/api/url/encode')
+        .send({ url });
+      
+      expect(res.status).toBe(200);
+      expect(res.text).toBe('https%3A%2F%2Fexample.com%2Fpath%20with%20spaces');
+    });
+
+    test('encodes special characters in query parameters', async () => {
+      const url = 'https://example.com/search?q=test&special=!@#$%^&*()';
+      const res = await request(app)
+        .post('/api/url/encode')
+        .send({ url });
     
     expect(res.status).toBe(200);
     expect(res.text).toBe('https%3A%2F%2Fexample.com%2Fpath%20with%20spaces%3Fq%3Dtest%26special%3D!%40%23%24%25%5E%26*()');

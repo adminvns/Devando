@@ -7,13 +7,39 @@ app.use(express.json());
 app.use('/api/generatePassword', passwordRouter);
 
 describe('Password Generator API', () => {
-  test('generates password with default settings', async () => {
-    const res = await request(app)
-      .post('/api/generatePassword')
-      .send({});
-    
-    expect(res.status).toBe(200);
-    expect(res.text).toMatch(/^[A-Za-z0-9!@#$%^&*()_+\[\]{}<>?,\.]{12}$/);
+  describe('Default Settings', () => {
+    test('generates password with default length', async () => {
+      const res = await request(app)
+        .post('/api/generatePassword')
+        .send({});
+      
+      expect(res.status).toBe(200);
+      expect(res.text).toMatch(/^[A-Za-z0-9!@#$%^&*()_+\[\]{}<>?,\.]{12}$/);
+    });
+
+    test('includes all character types by default', async () => {
+      const res = await request(app)
+        .post('/api/generatePassword')
+        .send({});
+      
+      expect(res.status).toBe(200);
+      expect(res.text).toMatch(/[A-Z]/); // Uppercase
+      expect(res.text).toMatch(/[a-z]/); // Lowercase
+      expect(res.text).toMatch(/[0-9]/); // Numbers
+      expect(res.text).toMatch(/[!@#$%^&*()_+\[\]{}<>?,\.]/); // Symbols
+    });
+
+    test('generates unique passwords', async () => {
+      const res1 = await request(app)
+        .post('/api/generatePassword')
+        .send({});
+      
+      const res2 = await request(app)
+        .post('/api/generatePassword')
+        .send({});
+      
+      expect(res1.text).not.toBe(res2.text);
+    });
   });
 
   test('generates password with custom length', async () => {
