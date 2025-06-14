@@ -6,7 +6,6 @@ module.exports = {
   forceExit: true,
   coveragePathIgnorePatterns: [
     "/node_modules/",
-    "routes/calculator.js",
     "server.js"
   ],
   // Optional: you can also set coverage thresholds for the remaining files

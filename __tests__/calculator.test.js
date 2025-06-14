@@ -7,6 +7,20 @@ app.use(express.json());
 app.use('/api/calculator', calculatorRouter);
 
 describe('Calculator API', () => {
+  let originalConsoleError;
+
+  beforeAll(() => {
+    // Store the original console.error
+    originalConsoleError = console.error;
+    // Mock console.error to suppress output during tests
+    console.error = jest.fn();
+  });
+
+  afterAll(() => {
+    // Restore the original console.error after tests
+    console.error = originalConsoleError;
+  });
+
   describe('Basic Operations', () => {
     test('performs addition', async () => {
       const res = await request(app)
@@ -111,5 +125,97 @@ describe('Calculator API', () => {
       .send({ expression: 'console.log(1)' });
     
     expect(res.status).toBe(400);
+  });
+
+  describe('Operation-based calculations', () => {
+    test('performs addition with operation mode', async () => {
+      const res = await request(app)
+        .post('/api/calculator')
+        .send({ operation: 'add', a: 5, b: 3 });
+      
+      expect(res.status).toBe(200);
+      expect(res.body.result).toBe(8);
+    });
+
+    test('performs subtraction with operation mode', async () => {
+      const res = await request(app)
+        .post('/api/calculator')
+        .send({ operation: 'subtract', a: 10, b: 4 });
+      
+      expect(res.status).toBe(200);
+      expect(res.body.result).toBe(6);
+    });
+
+    test('performs multiplication with operation mode', async () => {
+      const res = await request(app)
+        .post('/api/calculator')
+        .send({ operation: 'multiply', a: 6, b: 7 });
+      
+      expect(res.status).toBe(200);
+      expect(res.body.result).toBe(42);
+    });
+
+    test('performs division with operation mode', async () => {
+      const res = await request(app)
+        .post('/api/calculator')
+        .send({ operation: 'divide', a: 15, b: 3 });
+      
+      expect(res.status).toBe(200);
+      expect(res.body.result).toBe(5);
+    });
+
+    test('handles division by zero in operation mode', async () => {
+      const res = await request(app)
+        .post('/api/calculator')
+        .send({ operation: 'divide', a: 10, b: 0 });
+      
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Division by zero');
+    });
+
+    test('performs power operation', async () => {
+      const res = await request(app)
+        .post('/api/calculator')
+        .send({ operation: 'power', a: 2, b: 3 });
+      
+      expect(res.status).toBe(200);
+      expect(res.body.result).toBe(8);
+    });
+
+    test('performs modulo operation', async () => {
+      const res = await request(app)
+        .post('/api/calculator')
+        .send({ operation: 'mod', a: 17, b: 5 });
+      
+      expect(res.status).toBe(200);
+      expect(res.body.result).toBe(2);
+    });
+
+    test('handles invalid operation', async () => {
+      const res = await request(app)
+        .post('/api/calculator')
+        .send({ operation: 'invalid', a: 5, b: 3 });
+      
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Invalid operation');
+    });
+  });
+
+  test('rejects expressions with invalid characters', async () => {
+    const res = await request(app)
+      .post('/api/calculator')
+      .send({ expression: '2 + abc' });
+    
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Invalid characters in expression');
+  });
+
+  test('handles infinite results', async () => {
+    const res = await request(app)
+      .post('/api/calculator')
+      .send({ expression: '2 ** 1000' });
+    
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Invalid calculation: result is infinite or undefined');
   });
 });
