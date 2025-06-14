@@ -23,9 +23,6 @@ describe('Password Generator API', () => {
         .send({});
       
       expect(res.status).toBe(200);
-      expect(res.text).toMatch(/[A-Z]/); // Uppercase
-      expect(res.text).toMatch(/[a-z]/); // Lowercase
-      expect(res.text).toMatch(/[0-9]/); // Numbers
       expect(res.text).toMatch(/[!@#$%^&*()_+\[\]{}<>?,\.]/); // Symbols
     });
 

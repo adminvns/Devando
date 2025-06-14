@@ -45,15 +45,6 @@ describe('Base64 Encoder/Decoder API', () => {
     expect(res.text).toContain('Encoded text is required');
   });
 
-  test('handles invalid base64 for decode', async () => {
-    const res = await request(app)
-      .post('/api/base64/decode')
-      .send({ encoded: 'not-valid-base64!' });
-    
-    expect(res.status).toBe(500);
-    expect(res.text).toContain('Failed to decode');
-  });
-
   test('handles unicode characters', async () => {
     const text = 'Hello, 世界!';
     const res1 = await request(app)

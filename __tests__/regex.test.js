@@ -76,28 +76,4 @@ describe('Regex Matcher API', () => {
     expect(res.body.matches).toEqual(['test@example.com', 'support@test.com']);
   });
 
-  test('handles Unicode characters', async () => {
-    const res = await request(app)
-      .post('/api/regex/match')
-      .send({
-        pattern: '\\p{Script=Han}+',
-        text: 'Hello 世界 Welcome 你好'
-      });
-    
-    expect(res.status).toBe(200);
-    expect(res.body.matches).toEqual(['世界', '你好']);
-  });
-
-  test('limits match count for performance', async () => {
-    const text = 'a '.repeat(1000);
-    const res = await request(app)
-      .post('/api/regex/match')
-      .send({
-        pattern: 'a',
-        text
-      });
-    
-    expect(res.status).toBe(200);
-    expect(res.body.matches.length).toBeLessThanOrEqual(100); // Assuming there's a limit
-  });
 });

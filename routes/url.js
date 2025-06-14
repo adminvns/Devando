@@ -19,14 +19,14 @@ router.post('/encode', (req, res) => {
 
 // Decode URL
 router.post('/decode', (req, res) => {
-  const { encoded } = req.body;
+  const { url } = req.body;
 
-  if (!encoded) {
+  if (!url) {
     return res.status(400).send('Encoded URL is required');
   }
 
   try {
-    const decoded = decodeURIComponent(encoded);
+    const decoded = decodeURIComponent(url);
     res.send(decoded);
   } catch (err) {
     res.status(400).send('Invalid encoded URL');
