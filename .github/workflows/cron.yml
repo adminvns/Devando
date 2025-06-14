@@ -1,4 +1,4 @@
-name: Keep Render Alive with Playwright
+name: Cron Run
 
 on:
   schedule:
@@ -12,6 +12,7 @@ jobs:
         with:
           node-version: 18
       - run: npm install playwright
+      - run : npx playwright install
       - run: |
           node -e "
           const { chromium } = require('playwright');
