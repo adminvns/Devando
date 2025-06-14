@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const rateLimit = require('express-rate-limit');
 const jsonRoute = require('./routes/json');
 const base64Router = require('./routes/base64');
@@ -66,6 +67,9 @@ app.get('/', (req, res) => {
     });
   });
 
+//index.html renderer
+app.use(express.static(path.join(__dirname, 'public')));
+  
 //Json router
 app.use('/api/json', jsonRoute);
 
