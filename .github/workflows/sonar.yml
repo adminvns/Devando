@@ -1,4 +1,5 @@
-name: Build and Analyze
+name: Sonar Analysis
+# This workflow runs SonarQube analysis on the codebase.
 on:
   push:
     branches:
