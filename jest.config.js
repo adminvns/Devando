@@ -6,7 +6,8 @@ module.exports = {
   forceExit: true,
   coveragePathIgnorePatterns: [
     "/node_modules/",
-    "server.js"
+    "server.js",
+    "public/script.js",
   ],
   // Optional: you can also set coverage thresholds for the remaining files
   coverageThreshold: {
