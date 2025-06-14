@@ -13,7 +13,7 @@ const calculatorRouter = require('./routes/calculator');
 const loremRouter = require('./routes/loremRouter');
 const regexRouter = require('./routes/regexRouter');
 const uuidRouter = require('./routes/uuid');
-
+const healthRouter = require('./routes/health');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -99,6 +99,9 @@ app.use('/api/lorem', loremRouter);
 
 //regex router
 app.use('/api/regex', regexRouter);
+
+//health check
+app.use('/api/health', healthRouter);
 
 // Error Handling
 app.use((req, res) => res.status(404).json({ error: 'Error 404 !Not found' }));
