@@ -43,15 +43,28 @@ const checkApiKey = (req, res, next) => {
 };
 app.use(checkApiKey);
 
-// Placeholder root
+// Root Endpoint - Devando API Landing Info
 app.get('/', (req, res) => {
-  res.json({
-    name: 'Devando API',
-    version: '1.0.0',
-    endpoints: 'Coming Soon...',
-    status: 'Up and Running'
+    res.status(200).json({
+      name: 'Devando API Suite',
+      version: '1.0.0',
+      status: '✅ Up and Running',
+      message: 'Welcome to Devando - Developer Tools API Service',
+      toolsAvailable: [
+        'JSON Formatter',
+        'URL Encoder/Decoder',
+        'Text Encoder/Decoder',
+        'Hash Generator',
+        'Password Generator',
+        'UUID Generator',
+        'Lorem Ipsum Generator',
+        'Timezone Converter',
+        'Regex Matcher',
+        'Calculator'
+      ],
+      docs: 'Read the documentation at https://github.com/adminvns/Devnado/blob/main/README.md '
+    });
   });
-});
 
 //Json router
 app.use('/api/json', jsonRoute);
