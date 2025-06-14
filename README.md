@@ -6,9 +6,9 @@
 
 ---
 
-## 🚀 Live Demo (Coming Soon)
+## 🚀 Live Demo
 
-You will be able to try all endpoints from the browser or Postman soon!
+https://devnado.onrender.com
 
 ---
 
