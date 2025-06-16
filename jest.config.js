@@ -17,5 +17,7 @@ module.exports = {
       lines: 60,
       statements: 60
     }
-  }
+  },
+  // Silence console output during tests
+  silent: true
 };

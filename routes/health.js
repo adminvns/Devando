@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const logger = require('../logger'); // Add logger
 
 function formatUptime(seconds) {
   const hours = Math.floor(seconds / 3600);
@@ -9,8 +10,10 @@ function formatUptime(seconds) {
 }
 
 router.get('/', (req, res) => {
+  logger.info('[HEALTH] / endpoint hit');
   const uptimeInSeconds = process.uptime();
 
+  logger.debug('[HEALTH] Health check successful');
   res.status(200).json({
     status: 'healthy',
     message: 'Health check passed Successfully!',

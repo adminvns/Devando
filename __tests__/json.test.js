@@ -138,8 +138,7 @@ describe('JSON Formatter API', () => {
       .get('/api/json/format');
     
     expect(res.status).toBe(405);
-    expect(res.text).toBe('hey only a POST method allowed!');
-    expect(console.log).toHaveBeenCalledWith('Error: User hit GET Method!');
+    expect(res.text).toBe('Hey, only POST method is allowed!');
   });
 
   test('handles custom indentation', async () => {

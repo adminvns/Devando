@@ -14,6 +14,7 @@ const loremRouter = require('./routes/loremRouter');
 const regexRouter = require('./routes/regexRouter');
 const uuidRouter = require('./routes/uuid');
 const healthRouter = require('./routes/health');
+const logger = require('./logger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -103,12 +104,44 @@ app.use('/api/regex', regexRouter);
 //health check
 app.use('/api/health', healthRouter);
 
-// Error Handling
-app.use((req, res) => res.status(404).json({ error: 'Error 404 !Not found' }));
+// Error Handlers
+// 404 - Not Found Handler
+app.use((req, res) => {
+  logger.error(`404 - Route not found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    status: 'error',
+    code: 404,
+    message: 'The requested resource was not found',
+    details: {
+      method: req.method,
+      path: req.originalUrl,
+      suggestion: 'Please check the API documentation for available endpoints',
+      docs: 'https://github.com/adminvns/Devnado/blob/main/README.md'
+    }
+  });
+});
 
+// 500 - Global Error Handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something broke!Internal Server Error!' });
+  const statusCode = err.statusCode || 500;
+  const errorMessage = err.message || 'Internal Server Error';
+
+  logger.error(`${statusCode} - ${errorMessage}`, {
+    error: err.stack,
+    method: req.method,
+    url: req.originalUrl,
+    body: req.body,
+    query: req.query,
+    ip: req.ip
+  });
+
+  res.status(statusCode).json({
+    status: 'error',
+    code: statusCode,
+    message: process.env.NODE_ENV === 'production' ? 'An unexpected error occurred' : errorMessage,
+    requestId: req.id, // Useful for tracking errors in logs
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+  });
 });
 
 // Start Server

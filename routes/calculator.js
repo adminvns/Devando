@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const logger = require('../logger'); // Add logger
 
 // Check for potential infinite results in expressions
 const checkForInfiniteResults = (expression) => {
@@ -29,7 +30,8 @@ const evaluateExpression = (expression) => {
   }
 
   // Check for potentially infinite results
-  if (checkForInfiniteResults(safeExpression)) {      throw new Error('Invalid calculation: result is infinite or undefined');
+  if (checkForInfiniteResults(safeExpression)) {
+    throw new Error('Invalid calculation: result is infinite or undefined');
   }
 
   // Evaluate and check result
@@ -69,15 +71,17 @@ const performOperation = (operation, a, b) => {
 
 // POST /api/calculator
 router.post('/', (req, res) => {
+  logger.info('[CALCULATOR] / endpoint hit');
   try {
     const { expression, operation, a, b } = req.body;
 
     if (expression) {
       try {
         const result = evaluateExpression(expression);
+        logger.debug(`[CALCULATOR] Successfully evaluated expression: ${expression}`);
         return res.json({ expression, result });
       } catch (err) {
-        console.error('Expression evaluation error:', err);
+        logger.error(`Expression evaluation error: ${err.message}`);
         return res.status(400).json({ error: err.message });
       }
     }
@@ -85,16 +89,18 @@ router.post('/', (req, res) => {
     if (operation && a !== undefined && b !== undefined) {
       try {
         const result = performOperation(operation, a, b);
+        logger.debug(`[CALCULATOR] Successfully performed ${operation} operation`);
         return res.json({ operation, a: parseFloat(a), b: parseFloat(b), result });
       } catch (err) {
-        console.error('Operation error:', err);
+        logger.error(`Operation error: ${err.message}`);
         return res.status(400).json({ error: err.message });
       }
     }
 
+    logger.warn('[CALCULATOR] Missing required parameters');
     return res.status(400).json({ error: 'Provide either expression or operation with a & b' });
   } catch (error) {
-    console.error('Calculator route error:', error);
+    logger.error(`[CALCULATOR] Route error: ${error.message}`);
     res.status(400).json({ error: 'Invalid calculation', details: error.message });
   }
 });

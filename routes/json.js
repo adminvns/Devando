@@ -1,37 +1,37 @@
 const express = require('express');
 const router = express.Router();
+const logger = require('../logger'); // Add logger
 
-// POST /api/json/format
 router.post('/format', (req, res) => {
+  logger.info('[JSON] /format endpoint hit');
+
   try {
-    // Handle null or undefined body
     if (!req.body) {
+      logger.warn('[JSON] Missing request body');
       return res.status(400).json({
         success: false,
         error: 'Invalid JSON format. Request body is required.'
       });
     }
 
-    // Validate input is an object (not array or null)
     if (Array.isArray(req.body) || req.body === null) {
+      logger.warn('[JSON] Invalid type – expected object, got array/null');
       return res.status(400).json({
         success: false,
         error: 'Invalid JSON format. Provide a valid JSON object in request body.'
       });
     }
 
-    // Extract indent from body if present
     const indent = req.body.indent || 2;
     let inputJson = req.body;
 
-    // If indent was provided in the body, remove it from the input
     if ('indent' in req.body) {
       const { indent, ...rest } = req.body;
       inputJson = rest;
     }
 
-    // Handle empty objects
     if (Object.keys(inputJson).length === 0) {
+      logger.info('[JSON] Received empty object, returning {}');
       return res.status(200).send('{}');
     }
 
@@ -46,13 +46,15 @@ router.post('/format', (req, res) => {
         throw new Error('Failed to format JSON');
       }
 
+      logger.debug('[JSON] Successfully formatted JSON');
       res.setHeader('Content-Type', 'application/json');
-      return res.status(200).send(formatted);    } catch (circularError) {
-      console.error('[FORMAT ERROR] Circular reference detected:', circularError);
+      return res.status(200).send(formatted);
+    } catch (circularError) {
+      logger.error('[JSON] Circular reference error: ' + circularError.message);
       throw new Error('Cannot format JSON with circular references');
     }
   } catch (error) {
-    console.error('[FORMAT ERROR]', error.message);
+    logger.error(`[JSON] Unexpected error: ${error.message}`);
     return res.status(500).json({
       success: false,
       error: 'Something went wrong while formatting JSON. Please check your input!',
@@ -62,8 +64,8 @@ router.post('/format', (req, res) => {
 });
 
 router.get('/format', (req, res) => {
-    res.status(405).send("hey only a POST method allowed!");
-    console.log("Error: User hit GET Method!");
+  logger.warn('[JSON] GET method not allowed on /format');
+  res.status(405).send('Hey, only POST method is allowed!');
 });
 
 module.exports = router;
