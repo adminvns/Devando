@@ -1,0 +1,41 @@
+name: Deploy to Render
+
+on:
+  workflow_run:
+    workflows: ["Sonar Analysis"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create GitHub Deployment
+        id: create_deployment
+        uses: chrnorm/deployment-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: production
+          description: Production deployment to Render
+          ref: ${{ github.event.workflow_run.head_branch }}
+
+      - name: Mark Deployment In Progress
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          deployment-id: ${{ steps.create_deployment.outputs.deployment_id }}
+          environment: production
+          state: in_progress
+
+      - name: Trigger Render Deploy
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+
+      - name: Mark Deployment Success
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          deployment-id: ${{ steps.create_deployment.outputs.deployment_id }}
+          environment: production
+          state: success
