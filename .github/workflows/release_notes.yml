@@ -1,0 +1,20 @@
+name: Draft Release
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Render"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  draft_release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: release-drafter/release-drafter@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
