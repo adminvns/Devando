@@ -43,3 +43,8 @@ jobs:
           deployment-id: ${{ steps.create_deployment.outputs.deployment_id }}
           environment: production
           state: success
+
+      - name: Draft Release Notes
+        uses: release-drafter/release-drafter@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
