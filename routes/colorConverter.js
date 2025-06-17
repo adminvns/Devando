@@ -4,7 +4,7 @@ const { colord } = require('colord');
 const logger = require('../logger');
 
 // Supported color models
-const SUPPORTED_FORMATS = ['hex', 'rgb', 'hsl'];
+const SUPPORTED_FORMATS = ['hex', 'rgb', 'hsl', 'cmyk'];
 
 const parseInput = (value, from) => {
   if (from === 'hex') return colord(value);
