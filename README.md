@@ -105,7 +105,7 @@ Content-Type: application/json
 
 ```http
 
-POST /api/hash/generate
+POST /api/generateHash
 
 Content-Type: application/json
 
@@ -123,7 +123,7 @@ Content-Type: application/json
 
 ```http
 
-POST /api/password/generate
+POST /api/generatePassword
 
 Content-Type: application/json
 
@@ -177,7 +177,7 @@ Content-Type: application/json
 
 ```http
 
-POST /api/timezone/convert
+GET /api/timezone/convert
 
 Content-Type: application/json
 
@@ -215,7 +215,7 @@ Content-Type: application/json
 
 ```http
 
-POST /api/calc
+POST /api/calculator
 
 Content-Type: application/json
 

@@ -15,6 +15,9 @@ const regexRouter = require('./routes/regexRouter');
 const uuidRouter = require('./routes/uuid');
 const healthRouter = require('./routes/health');
 const logger = require('./logger');
+const jsonValidator = require('./routes/jsonValidator');
+const colorConverter = require('./routes/colorConverter');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -103,6 +106,12 @@ app.use('/api/regex', regexRouter);
 
 //health check
 app.use('/api/health', healthRouter);
+
+// json vaidator router
+app.use('/api/json', jsonValidator);
+
+// color converter router
+app.use('/api/color', colorConverter);
 
 // Error Handlers
 // 404 - Not Found Handler
