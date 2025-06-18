@@ -136,3 +136,6 @@ dist
 .pnp.*
 
 /.vscode
+
+#Ignore vscode AI rules
+.github\copilot-instructions.md
