@@ -56,7 +56,7 @@ jobs:
 
             echo "::notice::Raw API response: $response"
 
-            status=$(echo "$response" | jq -r '.[0].status // empty')
+            status=$(echo "$response" | jq -r '.[0].deploy.status // empty')
 
             if [ -z "$status" ]; then
               echo "::warning::No deployment found yet. Retrying in $SLEEP_SECONDS seconds..."
