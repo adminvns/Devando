@@ -1,13 +1,13 @@
 module.exports = {
   collectCoverage: true,
-  coverageDirectory: "coverage",
-  coverageReporters: ["lcov", "text"],
-  testEnvironment: "node",
+  coverageDirectory: 'coverage',
+  coverageReporters: ['lcov', 'text'],
+  testEnvironment: 'node',
   forceExit: true,
   coveragePathIgnorePatterns: [
-    "/node_modules/",
-    "server.js",
-    "public/script.js",
+    '/node_modules/',
+    'server.js',
+    'public/script.js'
   ],
   // Optional: you can also set coverage thresholds for the remaining files
   coverageThreshold: {
@@ -20,4 +20,4 @@ module.exports = {
   },
   // Silence console output during tests
   silent: true
-};
+}
