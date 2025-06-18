@@ -7,8 +7,9 @@ on:
       - completed
 
 permissions:
-  contents: read
+  contents: write
   deployments: write
+  statuses: write
 
 jobs:
   deploy:
@@ -22,24 +23,70 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: production
+          ref: main
           description: Production deployment to Render
-          ref: ${{ github.event.workflow_run.head_branch }}
+          initial-status: pending
+          transient-environment: false
+          auto-inactive: true
 
-      - name: Mark Deployment In Progress
-        uses: chrnorm/deployment-status@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          deployment-id: ${{ steps.create_deployment.outputs.deployment_id }}
-          environment: production
-          state: in_progress
+      - name: Log Deployment ID
+        run: 'echo "::notice::GitHub Deployment ID: ${{ steps.create_deployment.outputs.deployment_id }}"'
 
-      - name: Trigger Render Deploy
-        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+      - name: Trigger Render Deployment
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
 
-      - name: Mark Deployment Success
+      - name: Wait for Render Deployment
+        id: wait_deploy
+        run: |
+          echo "Polling Render API for deployment status..."
+
+          SERVICE_ID="${{ secrets.RENDER_SERVICE_ID }}"
+          API_KEY="${{ secrets.RENDER_API_KEY }}"
+          MAX_RETRIES=30
+          SLEEP_SECONDS=10
+          i=0
+          status=""
+
+          while [ $i -lt $MAX_RETRIES ]; do
+            status=$(curl -s -H "Authorization: Bearer $API_KEY" \
+              https://api.render.com/v1/services/$SERVICE_ID/deploys \
+              | jq -r '.[0].status')
+
+            echo "::notice::Current Render status: $status"
+
+            if [[ "$status" == "live" ]]; then
+              echo "success=true" >> $GITHUB_OUTPUT
+              break
+            elif [[ "$status" == "failed" ]]; then
+              echo "::error::Render deployment failed."
+              echo "success=false" >> $GITHUB_OUTPUT
+              break
+            fi
+
+            sleep $SLEEP_SECONDS
+            ((i++))
+          done
+
+          if [ "$status" != "live" ] && [ "$status" != "failed" ]; then
+            echo "::warning::Timed out waiting for deployment status."
+            echo "success=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Mark GitHub Deployment Success
+        if: steps.wait_deploy.outputs.success == 'true'
         uses: chrnorm/deployment-status@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           deployment-id: ${{ steps.create_deployment.outputs.deployment_id }}
           environment: production
           state: success
+
+      - name: Mark GitHub Deployment Failure
+        if: steps.wait_deploy.outputs.success != 'true'
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          deployment-id: ${{ steps.create_deployment.outputs.deployment_id }}
+          environment: production
+          state: failure
