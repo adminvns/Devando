@@ -20,19 +20,48 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v3
 
-      - name: 🔨 Trigger Render Deployment
+      - name: 📦 Create Deployment Record on GitHub
+        id: create_deploy
         run: |
-          echo "🚀 Triggering deployment on Render..."
+          echo "📦 Creating GitHub deployment record..."
+
+          DEPLOY_RES=$(curl -s -X POST "https://api.github.com/repos/${{ github.repository }}/deployments" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            -d '{"ref":"${{ github.sha }}", "environment":"production", "required_contexts":[], "auto_merge":false}')
+          
+          echo "$DEPLOY_RES"
+          DEPLOY_ID=$(echo "$DEPLOY_RES" | jq -r '.id')
+          echo "deployment_id=$DEPLOY_ID" >> "$GITHUB_OUTPUT"
+
+      - name: 🟡 Set Deployment Status to Queued
+        run: |
+          curl -s -X POST "https://api.github.com/repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            -d '{"state":"queued"}'
+
+      - name: 🟠 Set Deployment Status to In Progress
+        run: |
+          curl -s -X POST "https://api.github.com/repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            -d '{"state":"in_progress"}'
+
+      - name: 🚀 Trigger Render Deployment
+        run: |
+          echo "Triggering deployment on Render..."
 
           RESPONSE=$(curl -s -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}")
 
-          echo "✅ Deployment triggered."
+          echo "Deployment triggered!"
           echo "$RESPONSE"
 
       - name: ⏳ Wait for Render Deployment to Complete
+        id: wait_deploy
         run: |
-          echo "⏳ Polling Render deployment status..."
+          echo "Polling Render deployment status..."
 
           ENDPOINT="https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys"
           HEADER="Authorization: Bearer ${{ secrets.RENDER_API_KEY }}"
@@ -48,15 +77,30 @@ jobs:
             if [[ "$STATUS" == "created" || "$STATUS" == "build_in_progress" || "$STATUS" == "update_in_progress" ]]; then
               sleep 10
             else
+              echo "final_status=$STATUS" >> "$GITHUB_OUTPUT"
               if [[ "$STATUS" == "live" ]]; then
-                echo "✅ Deployment completed successfully!"
                 exit 0
               else
-                echo "❌ Deployment failed or canceled. Status: $STATUS"
                 exit 1
               fi
             fi
           done
 
-          echo "⏰ Timed out waiting for deployment to finish."
+          echo "final_status=timeout" >> "$GITHUB_OUTPUT"
           exit 1
+
+      - name: ✅ Set Deployment Status to Success
+        if: success()
+        run: |
+          curl -s -X POST "https://api.github.com/repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            -d '{"state":"success"}'
+
+      - name: ❌ Set Deployment Status to Failure
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.github.com/repos/${{ github.repository }}/deployments/${{ steps.create_deploy.outputs.deployment_id }}/statuses" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            -d '{"state":"failure"}'
