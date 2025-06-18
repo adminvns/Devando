@@ -52,7 +52,7 @@ jobs:
             echo "Attempt $((i+1)) of $MAX_RETRIES..."
 
             response=$(curl -s -H "Authorization: Bearer $API_KEY" \
-              https://api.render.com/v1/services/$SERVICE_ID/deploys)
+              "https://api.render.com/v1/services/$SERVICE_ID/deploys")
 
             echo "::notice::Raw API response: $response"
 
@@ -66,17 +66,18 @@ jobs:
 
             if [[ "$status" == "live" ]]; then
               echo "success=true" >> $GITHUB_OUTPUT
-              break
+              exit 0
             elif [[ "$status" == "failed" ]]; then
               echo "::error::Render deployment failed."
               echo "success=false" >> $GITHUB_OUTPUT
-              break
+              exit 1
             fi
 
             sleep $SLEEP_SECONDS
             ((i++))
           done
 
-          if [ "$status" != "live" ] && [ "$status" != "failed" ]; then
-            echo "::warning::Timed out waiting for deployment status."
-            echo "success=false" >> $GITHUB_OUTPUT
+          # After max retries
+          echo "::error::Timed out or stuck in unknown state: $status"
+          echo "success=false" >> $GITHUB_OUTPUT
+          exit 1
