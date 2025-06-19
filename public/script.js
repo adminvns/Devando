@@ -6,13 +6,19 @@ function loadTool(tool) {
         <h2>🧾 JSON Formatter</h2>
         <textarea id="json-input" placeholder="Paste JSON here..."></textarea>
         <button onclick="formatJSON()">Format</button>
-        <pre id="json-output"></pre>
+        <div class="output-container">
+          <pre id="json-output"></pre>
+          <button class="copy-button" onclick="copyToClipboard('json-output')">📋 Copy</button>
+        </div>
       `,      uuid: `
         <h2>🔑 UUID Generator</h2>
         <label>Count (1-50): <input type="number" id="uuid-count" value="5" min="1" max="50" /></label>
         <button onclick="generateUUIDs()">Generate</button>
         <div class="hint">Maximum 50 UUIDs can be generated at once</div>
-        <ul id="uuid-list"></ul>
+        <div class="output-container">
+          <ul id="uuid-list"></ul>
+          <button class="copy-button" onclick="copyToClipboard('uuid-list')">📋 Copy</button>
+        </div>
       `,lorem: `
         <h2>📄 Lorem Ipsum Generator</h2>
         <label>Type:
@@ -25,14 +31,20 @@ function loadTool(tool) {
         <label>Count: <input type="number" id="lorem-count" value="3" min="1" /></label>
         <button onclick="generateLorem()">Generate</button>
         <div class="hint">Maximum count depends on type: Words (1000), Sentences (100), Paragraphs (50)</div>
-        <div id="lorem-output"></div>
+        <div class="output-container">
+          <div id="lorem-output"></div>
+          <button class="copy-button" onclick="copyToClipboard('lorem-output')">📋 Copy</button>
+        </div>
       `,
       regex: `
         <h2>🔍 Regex Matcher</h2>
         <label>Pattern: <input type="text" id="regex-pattern" placeholder="\\d+" /></label>
         <textarea id="regex-text" placeholder="Enter text here..."></textarea>
         <button onclick="matchRegex()">Match</button>
-        <pre id="regex-output"></pre>
+        <div class="output-container">
+          <pre id="regex-output"></pre>
+          <button class="copy-button" onclick="copyToClipboard('regex-output')">📋 Copy</button>
+        </div>
       `,
         base64: `
     <h2>🧬 Base64 Encoder/Decoder</h2>
@@ -40,7 +52,10 @@ function loadTool(tool) {
     <br>
     <button onclick="base64Action('encode')">Encode</button>
     <button onclick="base64Action('decode')">Decode</button>
-    <pre id="base64-output"></pre>
+    <div class="output-container">
+          <pre id="base64-output"></pre>
+          <button class="copy-button" onclick="copyToClipboard('base64-output')">📋 Copy</button>
+        </div>
     `,
         hash: `
         <h2>🔐 Hash Generator</h2>
@@ -53,7 +68,10 @@ function loadTool(tool) {
         </label>
         <textarea id="hash-input" placeholder="Enter text..."></textarea>
         <button onclick="generateHash()">Generate</button>
-        <pre id="hash-output"></pre>
+        <div class="output-container">
+          <pre id="hash-output"></pre>
+          <button class="copy-button" onclick="copyToClipboard('hash-output')">📋 Copy</button>
+        </div>
     `,
         url: `
     <h2>🌐 URL Encoder/Decoder</h2>
@@ -61,13 +79,19 @@ function loadTool(tool) {
     <br>
     <button onclick="urlAction('encode')">Encode</button>
     <button onclick="urlAction('decode')">Decode</button>
-    <pre id="url-output"></pre>
+    <div class="output-container">
+          <pre id="url-output"></pre>
+          <button class="copy-button" onclick="copyToClipboard('url-output')">📋 Copy</button>
+        </div>
     `,
         calculator: `
     <h2>🧮 Calculator</h2>
     <input type="text" id="calc-expression" placeholder="e.g. (5 + 3) * 2" />
     <button onclick="evaluateCalc()">Calculate</button>
-    <pre id="calc-output"></pre>
+    <div class="output-container">
+          <pre id="calc-output"></pre>
+          <button class="copy-button" onclick="copyToClipboard('calc-output')">📋 Copy</button>
+        </div>
     `,
     timezone: `
   <h2>🌍 Timezone Converter</h2>
@@ -91,7 +115,10 @@ function loadTool(tool) {
     <input type="datetime-local" id="tz-input">
   </label>
   <button onclick="convertTimezone()">Convert</button>
-  <div id="tz-output"></div>
+  <div class="output-container">
+          <div id="tz-output"></div>
+          <button class="copy-button" onclick="copyToClipboard('tz-output')">📋 Copy</button>
+        </div>
 `,
 password: `
   <h2>🔐 Password Generator</h2>
@@ -393,16 +420,27 @@ async function generatePassword() {
 
   //toast
   
-  function showToast(message) {
-    const toastContainer = document.getElementById('toast-container');
-    if (!toastContainer) return;
+  async function copyToClipboard(elementId) {
+  const element = document.getElementById(elementId);
+  let text = element.innerText || element.textContent;
   
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    toastContainer.appendChild(toast);
-  
-    setTimeout(() => {
-      toast.remove();
-    }, 4000);
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast('Copied to clipboard!', 'success');
+  } catch (err) {
+    showToast('Failed to copy text', 'error');
   }
+}
+
+function showToast(message, type = 'error') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    
+    // Remove the toast after animation
+    setTimeout(() => {
+        toast.remove();
+    }, 4000);
+}
