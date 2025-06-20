@@ -36,6 +36,12 @@
   <nav>
     <button onclick="loadTool('json')">JSON Formatter</button>
     <button onclick="loadTool('base64')">Base64 Encoder/Decoder</button>
+    <button class="ai-btn highlight" onclick="loadTool('aicode')">AI Code Summarizer
+      <span class="ai-hover-label show">
+        <span class="ai-label-text">AI</span>
+        <span class="star star1">⭐</span>
+      </span>
+    </button>
     <button onclick="loadTool('password')">Password Generator</button>
     <button onclick="loadTool('uuid')">UUID Generator</button>
     <button onclick="loadTool('lorem')">Lorem Ipsum Generator</button>
@@ -44,12 +50,6 @@
     <button onclick="loadTool('timezone')">Timezone Converter</button>
     <button onclick="loadTool('url')">URL Encode/Decode</button>
     <button onclick="loadTool('calculator')">Calculator</button>
-    
-
-    <!-- <button onclick="loadTool('ip')">IP Address Info</button>
-    <button onclick="loadTool('weather')">Weather Info</button>
-    <button onclick="loadTool('currency')">Currency Converter</button> -->
-
   </nav>
 
   <main id="tool-container">

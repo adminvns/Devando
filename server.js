@@ -17,7 +17,7 @@ const healthRouter = require('./routes/health');
 const logger = require('./logger');
 const jsonValidator = require('./routes/jsonValidator');
 const colorConverter = require('./routes/colorConverter');
-
+const aiCodeSummarizer = require('./routes/aiCodeSummarizer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -112,6 +112,9 @@ app.use('/api/json', jsonValidator);
 
 // color converter router
 app.use('/api/color', colorConverter);
+
+// AI Code Summarizer Router
+app.use('/api/ai/summarize', aiCodeSummarizer);
 
 // Error Handlers
 // 404 - Not Found Handler

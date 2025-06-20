@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "A multipurpose API server for various utilities.",
   "dependencies": {
+    "axios": "^1.10.0",
     "colord": "^2.9.3",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",

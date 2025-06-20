@@ -121,17 +121,27 @@ function loadTool(tool) {
         </div>
 `,
 password: `
-  <h2>🔐 Password Generator</h2>
-  <label>Length (4-128): <input type="number" id="pw-length" value="12" min="4" max="128" /></label><br/>
-  <label><input type="checkbox" id="pw-uppercase" checked /> Uppercase</label>
-  <label><input type="checkbox" id="pw-lowercase" checked /> Lowercase</label>
-  <label><input type="checkbox" id="pw-numbers" checked /> Numbers</label>
-  <label><input type="checkbox" id="pw-symbols" checked /> Symbols</label><br/>
-  <button onclick="generatePassword()">Generate</button>
-  <div class="hint">Password length must be between 4 and 128 characters.</div>
-  <pre id="pw-output"></pre>
-`
-
+        <h2>🔐 Password Generator</h2>
+        <label>Length (4-128): <input type="number" id="pw-length" value="12" min="4" max="128" /></label><br/>
+        <label><input type="checkbox" id="pw-uppercase" checked /> Uppercase</label>
+        <label><input type="checkbox" id="pw-lowercase" checked /> Lowercase</label>
+        <label><input type="checkbox" id="pw-numbers" checked /> Numbers</label>
+        <label><input type="checkbox" id="pw-symbols" checked /> Symbols</label><br/>
+        <button onclick="generatePassword()">Generate</button>
+        <div class="hint">Password length must be between 4 and 128 characters.</div>
+        <pre id="pw-output"></pre>
+`,
+      aicode: `
+        <h2>🤖 AI Code Summarizer</h2>
+        <div class="input-group">
+          <label>Code:</label>
+          <textarea id="code-input" placeholder="Just paste your code snippet here and click 'Summarize'..." rows="10"></textarea>
+        </div>
+        <button id="summarize-btn" onclick="summarizeCode()">Summarize</button>
+        <div class="output-container">
+          <pre id="summary-output"></pre>
+        </div>
+      `,
     };
   
     container.innerHTML = templates[tool] || `<p>Tool not found! Integration in Progress....</p>`;
@@ -429,6 +439,40 @@ async function generatePassword() {
     showToast('Copied to clipboard!', 'success');
   } catch (err) {
     showToast('Failed to copy text', 'error');
+  }
+}
+
+async function summarizeCode() {
+  const code = document.getElementById('code-input').value.trim();
+  const btn = document.getElementById('summarize-btn');
+  const output = document.getElementById('summary-output');
+  if (!code) {
+    showToast('Please enter code to summarize.', 'error');
+    return;
+  }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="display:inline-block;width:18px;height:18px;vertical-align:middle;border:2px solid #ccc;border-top:2px solid #333;border-radius:50%;animation:spin 1s linear infinite;"></span> Summarizing...';
+  output.textContent = '';
+  try {
+    const response = await fetch('/api/ai/summarize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to summarize code');
+    }
+    const data = await response.json();
+    output.textContent = data.summary || 'No summary returned.';
+  } catch (err) {
+    output.textContent = '';
+    showToast(err.message || 'Failed to summarize code', 'error');
+  } finally {
+    // Keep the button disabled after first use until page reload
+    btn.disabled = true;
+    btn.classList.add('perma-disabled');
+    btn.innerHTML = 'Summarize';
   }
 }
 
